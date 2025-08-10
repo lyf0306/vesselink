@@ -1,0 +1,82 @@
+{
+    "pages": [
+        "pages/login/login",
+        "pages/index/index",
+        "pages/foodrecord/foodrecord",
+        "pages/userinfo/userinfo",
+        "pages/bloodsugar/bloodsugar",
+        "pages/sportrecord/sportrecord",
+        "pages/infoedit/infoedit",
+        "pages/report/report",
+        "pages/bloodsugarrecord/bloodsugarrecord",
+        "pages/bloodsugarhome/bloodsugarhome",
+        "pages/foodrecorddetail/foodrecorddetail",
+        "pages/bloodsugarfile/bloodsugarfile",
+        "pages/doctor/home/home",
+        "pages/doctor/patient/patient",
+        "pages/doctor/doctorinfo/doctorinfo",
+        "pages/insulinDoseOriginal/insulinDoseOriginal",
+        "pages/insulinDoseAdjust/insulinDoseAdjust",
+        "pages/dataupload/dataupload",
+        "pages/firstLogin/firstLogin",
+        "pages/reportdate/reportdate",
+        "pages/doctor/addpatient/addpatient"
+    ],
+    "tabBar": {
+        "custom": true,
+        "color": "#666666",
+        "selectedColor": "#FF5F15",
+        "backgroundColor": "#ffffff",
+        "borderStyle": "black",
+        "list": [
+            {
+                "selectedIconPath": "static/tabbar/selectedfoodrecord.png",
+                "iconPath": "static/tabbar/foodrecord.png",
+                "pagePath": "pages/foodrecord/foodrecord",
+                "text": "食物"
+            },
+            {
+                "selectedIconPath": "static/tabbar/selectedbloodsugar.png",
+                "iconPath": "static/tabbar/bloodsugar.png",
+                "pagePath": "pages/bloodsugar/bloodsugar",
+                "text": "血糖"
+            },
+            {
+                "selectedIconPath": "static/tabbar/selectedsportrecord.png",
+                "iconPath": "static/tabbar/sportrecord.png",
+                "pagePath": "pages/sportrecord/sportrecord",
+                "text": "运动"
+            },
+            {
+                "selectedIconPath": "static/tabbar/selecteduserinfo.png",
+                "iconPath": "static/tabbar/userinfo.png",
+                "pagePath": "pages/userinfo/userinfo",
+                "text": "我的"
+            },
+            {
+                "selectedIconPath": "static/tabbar/selectedhome.png",
+                "iconPath": "static/tabbar/home.png",
+                "pagePath": "pages/doctor/home/home",
+                "text": "主页"
+            },
+            {
+                "selectedIconPath": "static/tabbar/selecteduserinfo.png",
+                "iconPath": "static/tabbar/userinfo.png",
+                "pagePath": "pages/doctor/doctorinfo/doctorinfo",
+                "text": "我的"
+            }
+        ]
+    },
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#fff",
+        "navigationBarTitleText": "Weixin",
+        "navigationBarTextStyle": "black"
+    },
+    "sitemapLocation": "sitemap.json",
+    "usingComponents": {
+        "t-button": "tdesign-miniprogram/button/button",
+        "t-icon": "tdesign-miniprogram/icon/icon",
+        "t-message": "tdesign-miniprogram/message/message"
+    }
+}
