@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "t-stepper": "tdesign-miniprogram/stepper/stepper",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-button": "tdesign-miniprogram/button/button"
+  },
+  "navigationBarTitleText": "胰岛素剂量确定"
+}

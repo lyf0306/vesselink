@@ -1,0 +1,322 @@
+<!--初始胰岛素剂量确定-->
+<wxs module="filters" src="../../utils/addmul.wxs"></wxs>
+
+<view class="insulin-container">
+  <view class="WelcomeBar">
+    <view class="hello">你好</view>
+    <view class="name">初始胰岛素剂量确定</view>
+  </view>
+
+  <view class="smart-predict-floating-btn" bind:tap="showRFPrediction">
+   <t-icon name="analytics" size="20px" color="white" />
+   <text class="floating-btn-text">智能预测</text>
+  </view>
+
+  <!-- <view class="Card">
+        <view class="info-tag">基础信息</view>
+        <view class="info-item verticalLayout">
+            <view class="horizontalLayout">
+                <view class="info-label">体重(kg)</view>
+                <t-stepper defaultValue="{{basalInfo.bw}}" theme="outline" value="{{basalInfo.bw}}" bind:change="updateBW" />
+            </view>
+
+            <view class="info-divider"></view>
+
+            <view class="horizontalLayout">
+                <view class="info-label">年龄段</view>
+                <view class="info-picker">
+                    <view>{{ageGroup[basalInfo.ageIndex]}}</view>
+                    <picker bindchange="ageGroupBindPickerChange" value="{{basalInfo.ageIndex}}" range="{{ageGroup}}">
+                        <t-icon name="chevron-down" size="25px"></t-icon>
+                    </picker>
+                </view>
+            </view>
+
+            <view class="info-divider"></view>
+
+            <view class="horizontalLayout">
+                <view class="info-label">糖尿病类型</view>
+                <view class="info-picker">
+                    <view>{{diaTypeArray[basalInfo.diaTypeIndex]}}</view>
+                    <picker bindchange="diaTypeBindPickerChange" value="{{basalInfo.diaTypeIndex}}" range="{{diaTypeArray}}">
+                        <t-icon name="chevron-down" size="25px"></t-icon>
+                    </picker>
+                </view>
+            </view>
+
+            <view class="info-divider"></view>
+
+            <view class="horizontalLayout">
+                <view class="info-label">餐前目标血糖(mg/dL)</view>
+                <view class="info-range">
+                    <input bindinput="idealBGBindInput0" value="{{basalInfo.idealBG[0]}}" type="digit" class="info-input-bar" />
+                    <view>~</view>
+                    <input bindinput="idealBGBindInput1" value="{{basalInfo.idealBG[1]}}" type="digit" class="info-input-bar" />
+                </view>
+            </view>
+
+            <view class="info-divider"></view>
+
+            <view class="horizontalLayout">
+                <view class="info-label">餐后目标血糖(mg/dL)</view>
+                <view class="info-range">
+                    <input bindinput="idealBGBindInput2" value="{{basalInfo.idealBG[2]}}" type="digit" class="info-input-bar" />
+                    <view>~</view>
+                    <input bindinput="idealBGBindInput3" value="{{basalInfo.idealBG[3]}}" type="digit" class="info-input-bar" />
+                </view>
+            </view>
+
+            <view class="info-divider"></view>
+
+            <view class="horizontalLayout">
+                <view class="info-label">是否接受过治疗</view>
+                <view class="button-group">
+                    <t-button class="{{basalInfo.ifCureIndex == 1 ? 'selected' : 'unselected'}}" bindtap="selectYes">
+                        是
+                    </t-button>
+                    <t-button class="{{basalInfo.ifCureIndex == 0 ? 'selected' : 'unselected'}}" bindtap="selectNo">
+                        否
+                    </t-button>
+                </view>
+            </view>
+
+            <view class="info-divider" wx:if="{{ifShow}}"></view>
+
+            <view wx:if="{{ifShow}}" class="horizontalLayout">
+                <view class="info-label">历史治疗每日胰岛素总量</view>
+                <input bindinput="cureTDIBindInput" value="{{basalInfo.cureTDI}}" type="digit" class="myInput2" />
+            </view>
+
+            <view class="info-divider" wx:if="{{ifShow}}"></view>
+
+            <view wx:if="{{ifShow}}" class="horizontalLayout">
+                <view class="info-label">血糖控制情况</view>
+                <picker bindchange="bgConBindPickerChange" value="{{basalInfo.bgConIndex}}" range="{{BGConArray}}" class="myInput">{{BGConArray[basalInfo.bgConIndex]}}</picker>
+            </view>
+        </view>
+    </view>
+
+    <t-button bind:tap="oldCurePlanDecide" class="caculate-button">计算初始胰岛素剂量方案</t-button> -->
+
+  <view class="Card" wx:if="{{showOld}}">
+    <view class="info-tag">初始胰岛素方案</view>
+    <view class="info-item verticalLayout">
+      <view class="horizontalLayout">
+        <view class="info-label">全天胰岛素总量(U)</view>
+        <!-- 不支持手动修改总量 -->
+        <!-- <t-stepper theme="outline" value="{{filters.toFix1(oldInsulinPlan.oldTDI)}}" data-mode="oldInsulinPlan.oldTDI" bind:change="adjustTDI" step="{{0.1}}" /> -->
+        <text decode="{{true}}">{{filters.toFix1(oldInsulinPlan.oldTDI)}}</text>
+      </view>
+
+      <view class="info-divider"></view>
+
+      <view class="horizontalLayout">
+        <view class="info-label">全天基础胰岛素总量(U)</view>
+        <t-stepper theme="outline" value="{{filters.toFix1(oldInsulinPlan.oldBasalTDI)}}" data-mode="oldInsulinPlan.oldBasalTDI" bind:change="adjustTDI" step="{{0.1}}" />
+        <!-- <text decode="{{true}}">{{filters.toFix1(oldInsulinPlan.oldBasalTDI)}}</text> -->
+      </view>
+
+      <view class="info-divider"></view>
+
+      <view class="horizontalLayout">
+        <view class="info-label">全天餐时胰岛素总量(U)</view>
+        <t-stepper theme="outline" value="{{filters.toFix1(oldInsulinPlan.oldBolusTDI)}}" data-mode="oldInsulinPlan.oldBolusTDI" bind:change="adjustTDI" step="{{0.1}}" />
+        <!-- <text decode="{{true}}">{{filters.toFix1(oldInsulinPlan.oldBolusTDI)}}</text> -->
+      </view>
+
+      <view class="info-divider"></view>
+
+      <view class="verticalLayout small-width">
+        <view class="info-label left-label">全天各时段基础胰岛素注射率</view>
+        <view class="myTableRow">
+          <view class="th">时间段</view>
+          <view class="th">基础注射率</view>
+        </view>
+        <view wx:for="{{pumpTimeSlice}}" wx:key="index">
+          <view class="myTableRow">
+            <view class="td">{{item}}</view>
+            <!-- <view class="td">
+              <t-stepper theme="outline" value="{{filters.toFix1(oldInsulinPlan.oldPumpSlice[index])}}" data-mode="oldInsulinPlan.oldPumpSlice[{{index}}]" bind:change="adjustTDI" step="{{0.1}}" />
+            </view> -->
+            <view class="td">{{filters.toFix1(oldInsulinPlan.oldPumpSlice[index])}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="info-divider"></view>
+
+      <view class="verticalLayout small-width">
+        <view class="info-label left-label">各餐前注射剂量</view>
+        <view class="myTableRow">
+          <view class="th">注射时间</view>
+          <view class="th">注射剂量</view>
+        </view>
+        <view class="myTableRow">
+          <view class="td">早餐前</view>
+          <!-- <view class="td">
+            <t-stepper theme="outline" value="{{filters.toFix1(oldInsulinPlan.oldBolusSlice[0])}}" data-mode="oldInsulinPlan.oldBolusSlice[0]" bind:change="adjustTDI" step="{{0.1}}" />
+          </view> -->
+          <view class="td">{{filters.toFix1(oldInsulinPlan.oldBolusSlice[0])}}</view>
+        </view>
+        <view class="myTableRow">
+          <view class="td">午餐前</view>
+          <!-- <view class="td">
+            <t-stepper theme="outline" value="{{filters.toFix1(oldInsulinPlan.oldBolusSlice[1])}}" data-mode="oldInsulinPlan.oldBolusSlice[1]" bind:change="adjustTDI" step="{{0.1}}" />
+          </view> -->
+          <view class="td">{{filters.toFix1(oldInsulinPlan.oldBolusSlice[1])}}</view>
+        </view>
+        <view class="myTableRow">
+          <view class="td">晚餐前</view>
+          <!-- <view class="td">
+            <t-stepper theme="outline" value="{{filters.toFix1(oldInsulinPlan.oldBolusSlice[2])}}" data-mode="oldInsulinPlan.oldBolusSlice[2]" bind:change="adjustTDI" step="{{0.1}}" />
+          </view> -->
+          <view class="td">{{filters.toFix1(oldInsulinPlan.oldBolusSlice[2])}}</view>
+        </view>
+      </view>
+
+      <!-- <view class="info-divider"></view> -->
+
+      <!-- 没有算法，暂时注释 -->
+      <!-- <view class="verticalLayout small-width">
+        <view class="info-label left-label">每日多次注射剂量【泵转针剂】</view>
+        <view class="myTableRow">
+          <view class="th">注射时间</view>
+          <view class="th">注射剂量</view>
+        </view>
+        <view class="myTableRow">
+          <view class="td">早餐前（速效）</view>
+          <view class="td">
+            <t-stepper theme="outline" value="{{filters.toFix1(oldInjectPlan.morningBolus)}}" data-mode="oldInjectPlan.morningBolus" bind:change="adjustTDI" step="{{0.1}}" />
+          </view>
+        </view>
+        <view class="myTableRow">
+          <view class="td">午餐前（速效）</view>
+          <view class="td">
+            <t-stepper theme="outline" value="{{filters.toFix1(oldInjectPlan.afternoonBolus)}}" data-mode="oldInjectPlan.afternoonBolus" bind:change="adjustTDI" step="{{0.1}}" />
+          </view>
+        </view>
+        <view class="myTableRow">
+          <view class="td">晚餐前（速效）</view>
+          <view class="td">
+            <t-stepper theme="outline" value="{{filters.toFix1(oldInjectPlan.eveningBolus)}}" data-mode="oldInjectPlan.eveningBolus" bind:change="adjustTDI" step="{{0.1}}" />
+          </view>
+        </view>
+        <view class="myTableRow">
+          <view class="td">睡前（长效）</view>
+          <view class="td">
+            <t-stepper theme="outline" value="{{filters.toFix1(oldInjectPlan.bedtimeBasal)}}" data-mode="oldInjectPlan.bedtimeBasal" bind:change="adjustTDI" step="{{0.1}}" />
+          </view>
+        </view>
+      </view> -->
+    </view>
+  </view>
+
+  <t-button wx:if="{{showSave}}" bind:tap="saveTherapy" class="caculate-button">保存胰岛素剂量方案</t-button>
+  <t-popup 
+  visible="{{showRFModal}}" 
+  bind:visible-change="hideRFModal"
+  placement="center"
+  class="rf-prediction-modal">
+  
+  <view class="modal-content">
+    <view class="modal-header">
+      <view class="modal-title">智能剂量预测</view>
+      <view class="modal-close" bind:tap="hideRFModal">
+        <t-icon name="close" size="20px" color="#999" />
+      </view>
+    </view>
+
+    <view class="modal-body">
+      <view class="modal-description">
+        请填写以下临床参数，系统将基于机器学习模型为您推荐精准的胰岛素剂量
+      </view>
+
+      <!-- 降糖药物数量 -->
+      <view class="modal-form-item">
+        <view class="modal-label">降糖药物数量</view>
+        <picker 
+          bindchange="onRFPickerChange" 
+          data-field="hypoglycemic_agents"
+          range="{{hypoglycemicAgentsOptions}}"
+          range-key="label"
+          value="{{rfFormData.hypoglycemic_agents - 1}}">
+          <view class="modal-picker-value">
+            {{hypoglycemicAgentsOptions[rfFormData.hypoglycemic_agents - 1].label}}
+            <t-icon name="chevron-down" size="16px" color="#999" />
+          </view>
+        </picker>
+      </view>
+
+      <!-- 空腹C肽 -->
+      <view class="modal-form-item">
+        <view class="modal-label">空腹C肽 (nmol/L)</view>
+        <input 
+          class="modal-input"
+          type="digit"
+          placeholder="请输入空腹C肽值"
+          value="{{rfFormData.fasting_c_peptide}}"
+          bindinput="onRFInputChange"
+          data-field="fasting_c_peptide" />
+      </view>
+
+      <!-- 糖化血红蛋白 -->
+      <view class="modal-form-item">
+        <view class="modal-label">糖化血红蛋白 (%)</view>
+        <input 
+          class="modal-input"
+          type="digit"
+          placeholder="请输入糖化血红蛋白值"
+          value="{{rfFormData.hba1c}}"
+          bindinput="onRFInputChange"
+          data-field="hba1c" />
+      </view>
+
+      <!-- 糖化白蛋白 -->
+      <view class="modal-form-item">
+        <view class="modal-label">糖化白蛋白 (%)</view>
+        <input 
+          class="modal-input"
+          type="digit"
+          placeholder="请输入糖化白蛋白值"
+          value="{{rfFormData.glycated_albumin}}"
+          bindinput="onRFInputChange"
+          data-field="glycated_albumin" />
+      </view>
+
+      <!-- 低血糖史 -->
+      <view class="modal-form-item">
+        <view class="modal-label">是否有低血糖史</view>
+        <picker 
+          bindchange="onRFPickerChange" 
+          data-field="hypoglycemia"
+          range="{{hypoglycemiaOptions}}"
+          range-key="label"
+          value="{{rfFormData.hypoglycemia}}">
+          <view class="modal-picker-value">
+            {{hypoglycemiaOptions[rfFormData.hypoglycemia].label}}
+            <t-icon name="chevron-down" size="16px" color="#999" />
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <t-button 
+        theme="light" 
+        bind:tap="resetRFForm"
+        class="modal-btn-secondary">
+        重置
+      </t-button>
+      
+      <t-button 
+        theme="primary" 
+        loading="{{rfPredictionLoading}}"
+        bind:tap="performRFPrediction"
+        class="modal-btn-primary">
+        {{rfPredictionLoading ? '预测中...' : '开始预测'}}
+      </t-button>
+    </view>
+  </view>
+</t-popup>
+
+</view>
