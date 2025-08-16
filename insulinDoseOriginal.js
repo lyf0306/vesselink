@@ -547,7 +547,7 @@ Page({
       success: (res) => {
         console.log('RF预测响应:', res);
         
-        if (res.statusCode === 200 && res.data.status === 'success') {
+        if (res.statusCode === 200 && res.data.message.status === 'success') {
           const prediction = res.data.message.prediction;
           
           const total = Math.round(prediction * 10) / 10;
