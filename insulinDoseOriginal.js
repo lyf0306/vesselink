@@ -32,6 +32,15 @@ Page({
     },
     dailyTime: ['0', '1', 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], //24小时
     showOld: false,
+    
+    // ===== 新增：当前生效的胰岛素剂量数据 =====
+    currentInsulinData: {
+      totalDose: 0,        // 当前总剂量
+      basalDose: 0,        // 当前基础剂量
+      bolusDose: 0,        // 当前餐时剂量
+      isFromRFPrediction: false  // 标记是否来自RF预测
+    },
+    
     //历史胰岛素方案
     oldInsulinPlan: {
       oldTDI: 20, //全天胰岛素总剂量
@@ -200,11 +209,21 @@ Page({
     }
   },
 
-  convert(basal, bolus){
-    console.log("每日基础总量，餐时总剂量：", basal, bolus)
+  convert(basal, bolus, isFromRFPrediction = false){
+    console.log("每日基础总量，餐时总剂量：", basal, bolus, "来自RF预测:", isFromRFPrediction)
 
     const basalrate = basal / 24.0
     const TDI = basal + bolus
+
+    // ===== 新增：更新当前生效的胰岛素数据 =====
+    this.setData({
+      currentInsulinData: {
+        totalDose: TDI,
+        basalDose: basal,
+        bolusDose: bolus,
+        isFromRFPrediction: isFromRFPrediction
+      }
+    });
 
     this.setData({
       oldInsulinPlan: {
@@ -229,12 +248,27 @@ Page({
 
   //保存胰岛素方案
   saveTherapy: function () {
+    // ===== 修改：使用当前生效的胰岛素数据 =====
+    const currentData = this.data.currentInsulinData;
+    
+    // 如果有RF预测数据，优先使用RF预测的数据
+    const finalTDI = currentData.isFromRFPrediction ? currentData.totalDose : this.data.oldInsulinPlan.oldTDI;
+    const finalBasalTDI = currentData.isFromRFPrediction ? currentData.basalDose : this.data.oldInsulinPlan.oldBasalTDI;
+    const finalBolusTDI = currentData.isFromRFPrediction ? currentData.bolusDose : this.data.oldInsulinPlan.oldBolusTDI;
+    
+    console.log("保存的胰岛素数据:", {
+      finalTDI,
+      finalBasalTDI, 
+      finalBolusTDI,
+      isFromRFPrediction: currentData.isFromRFPrediction
+    });
+
     var requestData = {
       "patient_id": parseInt(this.data.patient_id),
       "save_time": Math.floor(Date.now() / 1000),
-      "tdi": parseFloat(this.data.oldInsulinPlan.oldTDI),
-      "basal_tdi": parseFloat(this.data.oldInsulinPlan.oldBasalTDI),
-      "bolus_tdi": parseFloat(this.data.oldInsulinPlan.oldBolusTDI),
+      "tdi": parseFloat(finalTDI),
+      "basal_tdi": parseFloat(finalBasalTDI),
+      "bolus_tdi": parseFloat(finalBolusTDI),
       "basal_inject": parseFloat(this.data.oldInsulinPlan.oldBasalInject),
       "pump_0_3": parseFloat(this.data.oldInsulinPlan.oldPumpSlice[0]),
       "pump_3_8": parseFloat(this.data.oldInsulinPlan.oldPumpSlice[1]),
@@ -245,7 +279,9 @@ Page({
       "breakfast_bolus": parseFloat(this.data.oldInsulinPlan.oldBolusSlice[0]),
       "lunch_bolus": parseFloat(this.data.oldInsulinPlan.oldBolusSlice[1]),
       "dinner_bolus": parseFloat(this.data.oldInsulinPlan.oldBolusSlice[2]),
-      "bedtime_basal": parseFloat(this.data.oldInjectPlan.bedtimeBasal)
+      "bedtime_basal": parseFloat(this.data.oldInjectPlan.bedtimeBasal),
+      // ===== 新增：标记数据来源 =====
+      "is_from_rf_prediction": currentData.isFromRFPrediction
     };
 
     console.log("requestData", requestData);
@@ -264,8 +300,13 @@ Page({
           this.setData({
             showSave: false,
           })
+          
+          // ===== 新增：根据数据来源显示不同的成功提示 =====
+          const successMessage = currentData.isFromRFPrediction ? 
+            '智能预测方案保存成功' : '胰岛素方案保存成功';
+            
           wx.showToast({
-            title: '保存成功',
+            title: successMessage,
             icon: 'success',
             duration: 2000
           })
@@ -496,7 +537,7 @@ Page({
     console.log('RF预测请求数据:', requestData);
 
     wx.request({
-      url: `${app.globalData.protocol}://${app.globalData.host}/rf_predict`,
+      url: `${app.globalData.protocol}://${app.globalData.host}/bgmp/api/algorithm?Action=RfPredict`,
       method: 'POST',
       header: {
         'Content-Type': 'application/json',
@@ -507,14 +548,14 @@ Page({
         console.log('RF预测响应:', res);
         
         if (res.statusCode === 200 && res.data.status === 'success') {
-          const prediction = res.data.prediction;
+          const prediction = res.data.message.prediction;
           
           const total = Math.round(prediction * 10) / 10;
           const basal = Math.round(total / 2 * 10) / 10;
           const bolus = Math.round(total / 2 * 10) / 10;
           
-          // 更新胰岛素方案显示
-          this.convert(basal, bolus);
+          // ===== 修改：标记数据来源为RF预测 =====
+          this.convert(basal, bolus, true);
           
           this.setData({
             showRFModal: false,
